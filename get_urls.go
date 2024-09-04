@@ -13,6 +13,10 @@ func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
 	reader := strings.NewReader(htmlBody)
 	z := html.NewTokenizer(reader)
 	var urls []string
+	inputURL, err := url.Parse(rawBaseURL)
+	if err != nil {
+		return nil, err
+	}
 
 	for {
 		tt := z.Next()
@@ -38,11 +42,8 @@ func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
 							if err != nil {
 								return nil, err
 							}
-							if parsedUrl.Scheme == "" {
-								parsedUrl.Scheme = "https"
-							}
 							if parsedUrl.Host == "" {
-								parsedUrl.Host = rawBaseURL
+								parsedUrl = inputURL.JoinPath(parsedUrl.Path)
 							}
 							urls = append(urls, parsedUrl.String())
 						}
