@@ -1,12 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	pages := map[string]int{}
-	crawlPage(getArgs(), getArgs(), pages)
-
-	for key, value := range pages {
-		fmt.Printf("URL: %s -- Mentions: %d\n", key, value)
+	config, err := configure(getArgs())
+	if err != nil {
+		fmt.Printf("Error - Configure: %v", err)
 	}
+
+	config.crawlPage(config.baseURL.String())
+
+	config.wg.Wait()
+
+	printReport(config.pages, config.baseURL.String())
 }
